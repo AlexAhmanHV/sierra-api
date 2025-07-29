@@ -2,14 +2,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /app
 
-# Kopiera projektfiler
-COPY *.sln ./
-COPY *.csproj ./
+# Kopiera sln och csproj
+COPY WebApplication1.sln ./
+COPY WebApplication1.csproj ./
 RUN dotnet restore
 
-# Kopiera resten och bygg
+# Kopiera allt och bygg
 COPY . ./
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release -o /app/out
 
 # Körsteg
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
