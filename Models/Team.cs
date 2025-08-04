@@ -1,6 +1,4 @@
-﻿using SierraApi.Models;
-
-public class Team
+﻿public class Team
 {
     public int Id { get; set; }
     public int RoundId { get; set; }
@@ -8,7 +6,7 @@ public class Team
     public string TeamType { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    public Round Round { get; set; }
-    public ICollection<TeamPlayer> TeamPlayers { get; set; }
-    public TeamScore TeamScore { get; set; }
+    public Round? Round { get; set; } = null; // ✅ optional
+    public ICollection<TeamPlayer> TeamPlayers { get; set; } = new List<TeamPlayer>(); // ✅ initierad
+    public TeamScore? TeamScore { get; set; } = null; // ✅ optional
 }
