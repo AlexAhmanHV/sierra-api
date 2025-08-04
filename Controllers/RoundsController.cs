@@ -26,7 +26,14 @@ namespace SierraApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Round>> CreateRound([FromBody] Round round)
         {
-            if (round == null) return BadRequest("Ogiltig payload.");
+            if (round == null)
+                return BadRequest("Ogiltig payload.");
+
+            // Kontrollera ModelState för valideringsfel
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             // Sätt CreatedAt om den saknas
             if (round.CreatedAt == default)
