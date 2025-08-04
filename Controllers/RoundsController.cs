@@ -23,30 +23,11 @@ namespace SierraApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Round>> CreateRound([FromBody] Round round)
+        public async Task<ActionResult<Round>> Create(Round round)
         {
-            if (round == null) return BadRequest("Ogiltig payload.");
-
-            // Sätt CreatedAt om den saknas
-            if (round.CreatedAt == default)
-                round.CreatedAt = DateTime.UtcNow;
-
-            // Normalisera datum till endast datumdel (om du vill)
-            round.Date = round.Date.Date;
-
-            try
-            {
-                _context.Rounds.Add(round);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                // Skicka tillbaka inner exception text så vi ser exakt DB-felet i Network-tabben
-                var detail = ex.InnerException?.Message ?? ex.Message;
-                return Problem(title: "Kunde inte spara runda", detail: detail, statusCode: 500);
-            }
-
-            return CreatedAtAction(nameof(GetRound), new { id = round.Id }, round);
+            _context.Rounds.Add(round);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(Get), new { id = round.Id }, round);
         }
 
         [HttpPut("{id}")]
