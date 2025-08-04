@@ -4,5 +4,5 @@
     public int Position { get; set; }
     public int PointsAwarded { get; set; }
 
-    public Team Team { get; set; }
+    public Team? Team { get; set; } = null; // ✅ optional, inget valideringsfel
 }
