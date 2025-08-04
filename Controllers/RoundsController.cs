@@ -32,8 +32,12 @@ namespace SierraApi.Controllers
             if (round.CreatedAt == default)
                 round.CreatedAt = DateTime.UtcNow;
 
-            // Normalisera datum till endast datumdel (om du vill)
-            round.Date = round.Date.Date;
+            // Normalisera datum till endast datumdel och sätt till UTC
+            round.Date = DateTime.SpecifyKind(round.Date.Date, DateTimeKind.Utc);
+
+            // Säkerställ att CreatedAt är UTC
+            if (round.CreatedAt.Kind != DateTimeKind.Utc)
+                round.CreatedAt = DateTime.SpecifyKind(round.CreatedAt, DateTimeKind.Utc);
 
             try
             {
