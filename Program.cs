@@ -3,12 +3,12 @@ using SierraApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Lägg till tjänster
+// ✅ Tjänster
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ CORS – Global policy
+// ✅ Global CORS-policy – inga begränsningar
 builder.Services.AddCors();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -16,30 +16,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// ✅ Swagger – endast i utveckling
+// ✅ Swagger i dev
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// ✅ CORS – tillåt alla origins
+// ✅ Tillåt alla origins (för dev/test)
 app.UseCors(policy =>
     policy.AllowAnyOrigin()
           .AllowAnyMethod()
           .AllowAnyHeader()
 );
 
-// ✅ Lägg till CORS-header även vid fel (t.ex. 500)
-app.Use(async (context, next) =>
+// ✅ Fånga 500-fel och lägg till CORS-header även i fel
+app.UseExceptionHandler(errorApp =>
 {
-    context.Response.OnStarting(() =>
+    errorApp.Run(async context =>
     {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
         context.Response.Headers["Access-Control-Allow-Origin"] = "*";
-        return Task.CompletedTask;
-    });
 
-    await next.Invoke();
+        await context.Response.WriteAsync("{\"error\": \"Ett oväntat fel inträffade i servern.\"}");
+    });
 });
 
 // ✅ Övrig middleware
