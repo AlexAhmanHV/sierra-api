@@ -3,46 +3,46 @@ using SierraApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Lägg till controllers
+// Add controllers
 builder.Services.AddControllers();
 
-// ✅ Swagger (API-dokumentation)
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ CORS-policy – tillåt alla origins (för utveckling och temporärt för produktion)
+// CORS - more specific configuration
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins", policy =>
+    options.AddPolicy("AllowLocalhost", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "https://localhost:5173")
               .AllowAnyMethod()
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials(); // If you need cookies/auth
     });
 });
 
-// ✅ PostgreSQL via Entity Framework
+// PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// ✅ Swagger – endast i utvecklingsmiljö
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// ✅ CORS måste aktiveras FÖRE controller-routingen – och ALLTID, oavsett miljö
-app.UseCors("AllowAllOrigins");
+// CORS must be before routing and controllers
+app.UseCors("AllowLocalhost");
 
-// ✅ Middleware för HTTPS och auth
+// Other middleware
 app.UseHttpsRedirection();
 app.UseAuthorization();
 
-// ✅ Aktivera API-routingen
+// Controllers
 app.MapControllers();
 
-// ✅ Starta appen
 app.Run();
