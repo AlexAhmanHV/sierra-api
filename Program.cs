@@ -35,7 +35,7 @@ if (app.Environment.IsDevelopment())
 }
 
 // ✅ CORS måste komma innan routing
-app.UseCors("AllowAll");
+app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
