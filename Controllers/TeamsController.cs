@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SierraApi.Data;
 using SierraApi.Models;
+using SierraApi.Models.Dtos;
 
 namespace SierraApi.Controllers
 {
@@ -24,31 +25,29 @@ namespace SierraApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Team>> Create([FromBody] Team team)
+        public async Task<ActionResult<Team>> Create([FromBody] TeamCreateDto dto)
         {
-            if (team == null)
-                return BadRequest("Invalid payload.");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Set CreatedAt if missing and ensure UTC
-            if (team.CreatedAt == default)
-                team.CreatedAt = DateTime.UtcNow;
-            else if (team.CreatedAt.Kind != DateTimeKind.Utc)
-                team.CreatedAt = DateTime.SpecifyKind(team.CreatedAt, DateTimeKind.Utc);
+            var existing = await _context.Teams
+                .FirstOrDefaultAsync(t => t.RoundId == dto.RoundId && t.TeamNumber == dto.TeamNumber);
 
-            try
+            if (existing != null)
+                return Conflict($"Team number {dto.TeamNumber} already exists for this round.");
+
+            var team = new Team
             {
-                _context.Teams.Add(team);
-                await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(Get), new { id = team.Id }, team);
-            }
-            catch (DbUpdateException ex)
-            {
-                var detail = ex.InnerException?.Message ?? ex.Message;
-                return Problem(title: "Could not save team", detail: detail, statusCode: 500);
-            }
+                RoundId = dto.RoundId,
+                TeamNumber = dto.TeamNumber,
+                TeamType = dto.TeamType,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Teams.Add(team);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(Get), new { id = team.Id }, team);
         }
 
         [HttpPut("{id}")]
