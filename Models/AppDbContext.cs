@@ -22,7 +22,9 @@ namespace SierraApi.Data
             {
                 entity.ToTable("players");
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .ValueGeneratedOnAdd(); // ✅ Auto-increment
                 entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             });
@@ -32,7 +34,9 @@ namespace SierraApi.Data
             {
                 entity.ToTable("rounds");
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .ValueGeneratedOnAdd(); // ✅ Auto-increment
                 entity.Property(e => e.Name).HasColumnName("name");
                 entity.Property(e => e.RoundNumber).HasColumnName("round_number");
                 entity.Property(e => e.Date).HasColumnName("date");
@@ -45,7 +49,9 @@ namespace SierraApi.Data
             {
                 entity.ToTable("teams");
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .ValueGeneratedOnAdd(); // ✅ Auto-increment - This was missing!
                 entity.Property(e => e.RoundId).HasColumnName("round_id");
                 entity.Property(e => e.TeamNumber).HasColumnName("team_number");
                 entity.Property(e => e.TeamType).HasColumnName("team_type");
@@ -88,7 +94,9 @@ namespace SierraApi.Data
             {
                 entity.ToTable("bonuses");
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Id)
+                      .HasColumnName("id")
+                      .ValueGeneratedOnAdd(); // ✅ Auto-increment
                 entity.Property(e => e.PlayerId).HasColumnName("player_id");
                 entity.Property(e => e.RoundId).HasColumnName("round_id");
                 entity.Property(e => e.HoleNumber).HasColumnName("hole_number");
@@ -97,7 +105,7 @@ namespace SierraApi.Data
                 entity.Property(e => e.Note).HasColumnName("note");
             });
 
-            // 🔗 Relationships (samma som tidigare)
+            // 🔗 Relationships
             modelBuilder.Entity<TeamPlayer>()
                 .HasOne(tp => tp.Team)
                 .WithMany(t => t.TeamPlayers)
@@ -138,6 +146,5 @@ namespace SierraApi.Data
                 .WithMany(r => r.Bonuses)
                 .HasForeignKey(b => b.RoundId);
         }
-
     }
 }
