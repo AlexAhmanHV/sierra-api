@@ -3,12 +3,12 @@ using SierraApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Add services
+// ✅ Lägg till tjänster
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ CORS – Global, ingen namngiven policy
+// ✅ CORS – Global policy
 builder.Services.AddCors();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -16,19 +16,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// ✅ Swagger endast i utveckling
+// ✅ Swagger – endast i utveckling
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// ✅ CORS – Global policy som alltid körs
+// ✅ CORS – tillåt alla origins
 app.UseCors(policy =>
     policy.AllowAnyOrigin()
           .AllowAnyMethod()
           .AllowAnyHeader()
 );
+
+// ✅ Lägg till CORS-header även vid fel (t.ex. 500)
+app.Use(async (context, next) =>
+{
+    context.Response.OnStarting(() =>
+    {
+        context.Response.Headers["Access-Control-Allow-Origin"] = "*";
+        return Task.CompletedTask;
+    });
+
+    await next.Invoke();
+});
 
 // ✅ Övrig middleware
 app.UseHttpsRedirection();
