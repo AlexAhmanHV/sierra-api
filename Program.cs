@@ -3,46 +3,35 @@ using SierraApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add controllers
+// ✅ Add services
 builder.Services.AddControllers();
-
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// CORS - more specific configuration
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowLocalhost", policy =>
-    {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:3000", "https://localhost:5173")
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials(); // If you need cookies/auth
-    });
-});
+// ✅ CORS – Global, ingen namngiven policy
+builder.Services.AddCors();
 
-// PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// Swagger
+// ✅ Swagger endast i utveckling
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// CORS must be before routing and controllers
-app.UseCors("AllowLocalhost");
+// ✅ CORS – Global policy som alltid körs
+app.UseCors(policy =>
+    policy.AllowAnyOrigin()
+          .AllowAnyMethod()
+          .AllowAnyHeader()
+);
 
-// Other middleware
+// ✅ Övrig middleware
 app.UseHttpsRedirection();
 app.UseAuthorization();
-
-// Controllers
 app.MapControllers();
-
 app.Run();
