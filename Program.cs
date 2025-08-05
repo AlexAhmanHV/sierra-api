@@ -13,7 +13,7 @@ builder.Services.AddSwaggerGen();
 // ✅ CORS (för utveckling, tillåt alla origin – ändra för produktion!)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowAllOrigins", policy =>
     {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
