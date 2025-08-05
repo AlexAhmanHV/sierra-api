@@ -3,14 +3,14 @@ using SierraApi.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Add controllers
+// ✅ Lägg till controllers
 builder.Services.AddControllers();
 
-// ✅ Swagger
+// ✅ Swagger (API-dokumentation)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// ✅ CORS (för utveckling, tillåt alla origin – ändra för produktion!)
+// ✅ CORS-policy – tillåt alla origins (för utveckling och temporärt för produktion)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
@@ -27,18 +27,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// ✅ Middleware pipeline
+// ✅ Swagger – endast i utvecklingsmiljö
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// ✅ CORS måste komma innan routing
+// ✅ CORS måste aktiveras FÖRE controller-routingen – och ALLTID, oavsett miljö
 app.UseCors("AllowAllOrigins");
 
+// ✅ Middleware för HTTPS och auth
 app.UseHttpsRedirection();
 app.UseAuthorization();
 
+// ✅ Aktivera API-routingen
 app.MapControllers();
+
+// ✅ Starta appen
 app.Run();
