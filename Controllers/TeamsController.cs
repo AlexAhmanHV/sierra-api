@@ -44,10 +44,20 @@ namespace SierraApi.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Teams.Add(team);
-            await _context.SaveChangesAsync();
+            Console.WriteLine($"👀 Attempting to create team: roundId={team.RoundId}, teamNumber={team.TeamNumber}, teamType={team.TeamType}");
 
-            return CreatedAtAction(nameof(Get), new { id = team.Id }, team);
+            try
+            {
+                _context.Teams.Add(team);
+                await _context.SaveChangesAsync();
+                return CreatedAtAction(nameof(Get), new { id = team.Id }, team);
+            }
+            catch (DbUpdateException ex)
+            {
+                var detail = ex.InnerException?.Message ?? ex.Message;
+                Console.WriteLine($"❌ DB error: {detail}");
+                return Problem(title: "Could not save team", detail: detail, statusCode: 500);
+            }
         }
 
         [HttpPut("{id}")]
