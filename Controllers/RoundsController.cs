@@ -86,15 +86,23 @@ namespace SierraApi.Controllers
         [HttpGet("{id}/teams")]
         public async Task<ActionResult<IEnumerable<Team>>> GetTeamsForRound(int id)
         {
-            var teams = await _context.Teams
-                .Where(t => t.RoundId == id)
-                .Include(t => t.TeamPlayers)
-                    .ThenInclude(tp => tp.Player)
-                .Include(t => t.TeamScore)
-                .OrderBy(t => t.TeamNumber)
-                .ToListAsync();
+            try
+            {
+                var teams = await _context.Teams
+                    .Where(t => t.RoundId == id)
+                    .Include(t => t.TeamPlayers)
+                        .ThenInclude(tp => tp.Player)
+                    .Include(t => t.TeamScore)
+                    .OrderBy(t => t.TeamNumber)
+                    .ToListAsync();
 
-            return Ok(teams);
+                return Ok(teams);
+            }
+            catch (Exception ex)
+            {
+                // 👇 Exponerar exakt felmeddelande i svar (för felsökning)
+                return Problem(title: "Kunde inte hämta lag", detail: ex.ToString(), statusCode: 500);
+            }
         }
 
     }
