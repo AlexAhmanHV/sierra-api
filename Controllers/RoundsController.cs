@@ -83,5 +83,19 @@ namespace SierraApi.Controllers
 
             return NoContent();
         }
+        [HttpGet("{id}/teams")]
+        public async Task<ActionResult<IEnumerable<Team>>> GetTeamsForRound(int id)
+        {
+            var teams = await _context.Teams
+                .Where(t => t.RoundId == id)
+                .Include(t => t.TeamPlayers)
+                    .ThenInclude(tp => tp.Player)
+                .Include(t => t.TeamScore)
+                .OrderBy(t => t.TeamNumber)
+                .ToListAsync();
+
+            return Ok(teams);
+        }
+
     }
 }
