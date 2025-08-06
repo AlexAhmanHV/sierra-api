@@ -100,8 +100,12 @@ namespace SierraApi.Controllers
             }
             catch (Exception ex)
             {
-                // 👇 Exponerar exakt felmeddelande i svar (för felsökning)
-                return Problem(title: "Kunde inte hämta lag", detail: ex.ToString(), statusCode: 500);
+                // 🧪 FÖR FELFELSÖKNING – visa hela felet i responsen
+                return Problem(
+                    title: "Kunde inte hämta lag",
+                    detail: ex.ToString(), // <<🧠 viktigt!
+                    statusCode: 500
+                );
             }
         }
 
