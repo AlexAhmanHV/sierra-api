@@ -1,10 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SierraApi.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ✅ Tjänster
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // 🔥 Fix för cykliska referenser som orsakar JSON-serialization error
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
