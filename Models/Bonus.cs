@@ -1,4 +1,7 @@
-﻿public class Bonus
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.Text.Json.Serialization;
+
+public class Bonus
 {
     public int Id { get; set; }
     public int PlayerId { get; set; }
@@ -8,6 +11,11 @@
     public int Points { get; set; }
     public string Note { get; set; }
 
-    public Player Player { get; set; }
-    public Round Round { get; set; }
+    [ValidateNever]
+    [JsonIgnore]                 // (valfritt men tryggt för POST)
+    public Player? Player { get; set; }   // gör nullable
+
+    [ValidateNever]
+    [JsonIgnore]
+    public Round? Round { get; set; }     // gör nullable
 }
